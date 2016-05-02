@@ -17,17 +17,25 @@ private:
 	int MAXLEVEL;
 	float probability;
 	int size;
+    Node<TData> *iterator;
 public:
 	SkipList(int maxlevel, float p);
 	~SkipList();
 
 	int randomLevel();
-	Node<TData>* find(int key);
-	void insert(int key, TData *&data);
+    Node<TData>* find(int key);
+    void insert(int key, TData *&data);
 	void remove(int key);
 
 	void show();
 	void showLevels();
+
+    int getPosition(int key);
+
+    Node<TData>* getCurrent() { return iterator; }
+    void goNext(){ if(iterator) iterator = iterator->forward->at(0); }
+    void reset(){ iterator = header; }
+    int getSize(){ return size; }
 
 	int isEmpty(){ return (size == 0 && header == 0); }
 };
@@ -69,15 +77,34 @@ Node<TData>* SkipList<TData>::find(int key){
 	Node<TData> *x = header;
 	if (size == 0) 
 		return 0;
-	if (header->key == key) 
-		return header;
+    if (header->key == key)
+        return header;
 	for (int i = MAXLEVEL - 1; i >= 0; i--){
-		while (x->forward->at(i) && ((x->forward->at(i))->key < key))
-			x = x->forward->at(i);
+        while (x->forward->at(i) && ((x->forward->at(i))->key < key))
+            x = x->forward->at(i);
 	}
 	x = x->forward->at(0);
-	if (x != 0 && x->key == key) return x;
+    if (x != 0 && x->key == key) return x;
 	return 0;
+}
+
+template <class TData>
+int SkipList<TData>::getPosition(int key){
+    if (size == 0)
+        return -1;
+    if(header->key == key)
+        return 0;
+    reset();
+    int position = 0;
+    while(getCurrent() != 0){
+        if(iterator->key == key)
+            return position;
+        if(iterator->key > key)
+            return -1;
+        goNext();
+        position++;
+    }
+    return -1;
 }
 
 template <class TData>
@@ -85,7 +112,7 @@ void SkipList<TData>::insert(int key, TData *&data){
 	if (size == 0){
 		header = new Node<TData>(data, key, MAXLEVEL);
 		size++;
-		return;
+        return;
 	}
 	if (key < header->key){
         Node<TData> *x = header;
@@ -107,8 +134,8 @@ void SkipList<TData>::insert(int key, TData *&data){
 	vector<Node<TData>*> *update = new vector<Node<TData>*>(MAXLEVEL);
 	Node<TData> *x = header;
 	for (int i = MAXLEVEL - 1; i >= 0; i--){
-		while (x->forward->at(i)!=0 && (x->forward->at(i))->key < key )
-			x = x->forward->at(i);
+        while (x->forward->at(i)!=0 && (x->forward->at(i))->key < key )
+            x = x->forward->at(i);
 		update->at(i) = x;
 	}
 	if (x->forward->at(0) == 0){
@@ -119,11 +146,11 @@ void SkipList<TData>::insert(int key, TData *&data){
 		}
 		delete update;
 		size++;
-		return;
+        return;
 	}// вставка после последнего
 	x = x->forward->at(0);
 	if (x->key == key)
-		return; // key is already exist
+        return; // key is already exist
 
 	int newLevel = randomLevel();
 	Node<TData> *newNode = new Node<TData>(data, key, newLevel);
@@ -132,7 +159,7 @@ void SkipList<TData>::insert(int key, TData *&data){
 		update->at(i)->forward->at(i) = newNode;
 	}
 	delete update;
-	size++;
+    size++;
 }
 
 template <class TData>

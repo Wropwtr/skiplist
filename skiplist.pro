@@ -6,4 +6,6 @@ SUBDIRS += \
     projects/skiplist_test \
     projects/skiplist_test \
     projects/sample_skiplist \
-    projects/comparsion
+    projects/comparsion \
+    projects/table \
+    projects/table
