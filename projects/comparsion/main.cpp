@@ -6,14 +6,13 @@
 
 using namespace std;
 
-#define NELEMS 16384
+#define NELEMS 1024
 
 int main(){
     List<int> *list = new List<int>();
-    SkipList<int> *slist = new SkipList<int>(14, 0.5f); // for 2^14 = NELEMS
+    SkipList<int> *slist = new SkipList<int>(10, 0.5f); // for 2^10 = NELEMS
     int *a = new int;
     *a = 2345;
-    double no_cache = 0;
 
     srand(time(NULL));
 
@@ -33,13 +32,14 @@ int main(){
             slist->insert(i, a);
         }*/
 
+    cout << "For " << NELEMS << " elements" << endl;
+
     volatile int key;
     for (int nmeasures = 1; nmeasures <= 5; nmeasures++){
         clock_t begin = clock();
         for (int i = 0; i < 10000; i++){
             key = ((int)rand() % NELEMS);
             list->search(key);
-            no_cache += (double)rand() / (RAND_MAX);
         }
         clock_t end = clock();
         double elapsed_secs_list = double(end - begin) / CLOCKS_PER_SEC;
@@ -48,7 +48,6 @@ int main(){
         for (int i = 0; i < 10000; i++){
             key = ((int)rand() % NELEMS);
             slist->find(key);
-            no_cache += (double)rand() / (RAND_MAX);
         }
         end = clock();
         double elapsed_secs_slist = double(end - begin) / CLOCKS_PER_SEC;
@@ -58,8 +57,6 @@ int main(){
         cout << endl;
     }
     getchar();
-    slist->showLevels();
-    slist->insert((int)no_cache,a);
 
     delete list;
     delete slist;
