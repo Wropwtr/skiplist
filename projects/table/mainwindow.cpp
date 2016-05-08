@@ -124,6 +124,9 @@ void MainWindow::on_btnClear_clicked()
         delete slist;
     ui->tableWidget->clear();
     ui->tableWidget->setRowCount(0);
+    ui->edtAddData->setText("");
+    ui->edtAddKey->setText("");
+    ui->edtDFKey->setText("");
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Key" << "Data");
 }
 
@@ -172,10 +175,9 @@ void MainWindow::on_btnFind_clicked()
         return;
     }
     int nMilliseconds = myTimer.elapsed();
+    ui->tableWidget->selectRow(position);
     QMessageBox::information(this,"Success","Element finded in "+QString::number(position+1)+" position.\n"+
                              "Search time : "+QString::number(nMilliseconds)+" ms.");
-    ui->tableWidget->selectRow(position);
-    // ?? Cancel then or what
 }
 
 void MainWindow::on_sbLvl_valueChanged(int arg1)
@@ -214,8 +216,9 @@ void MainWindow::on_btnDelete_clicked()
         return;
     }
     slist->remove(key);
-    QMessageBox::information(this,"Success","Element with this key successfully removed.");
     ui->tableWidget->removeRow(position);
+    QMessageBox::information(this,"Success","Element with this key successfully removed.");
+
 }
 
 void MainWindow::on_sbLvl_valueChanged(const QString &arg1)
