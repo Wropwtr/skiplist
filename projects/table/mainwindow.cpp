@@ -19,10 +19,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Key" << "Data");
-    ui->tableWidget->setColumnWidth(0, 110);
-    slist = new SkipList<string>(ui->sbLvl->value(),ui->sbProb->value());
+    ui->tableWidget->setColumnWidth(0, 110);  
     ui->tableWidget->setEditTriggers(QTableWidget::NoEditTriggers);
     ui->tableWidget->horizontalHeader()->setStretchLastSection(1);
+    slist = new SkipList<string>(ui->sbLvl->value(),ui->sbProb->value());
 }
 
 MainWindow::~MainWindow()
@@ -226,4 +226,37 @@ void MainWindow::on_sbLvl_valueChanged(const QString &arg1)
     }
     ui->btnClear->click();
     slist = new SkipList<string>(arg1.toInt(),ui->sbProb->value());
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    QWidget *qw = new QWidget();
+    QTableWidget *w = new QTableWidget(qw);
+    qw->setFixedSize(200,450);
+    w->setFixedSize(199,449);
+    qw->setWindowFlags(Qt::Popup);
+
+    w->setColumnCount(2);
+    w->setColumnWidth(0, 100);
+    w->setEditTriggers(QTableWidget::NoEditTriggers);
+    w->horizontalHeader()->setStretchLastSection(1);
+    w->setHorizontalHeaderLabels(QStringList() << "Key" << "Level");
+    w->setRowCount(slist->getSize());
+    int ins_row = 0;
+    slist->reset();
+    while(slist->getCurrent() != 0){
+        QTableWidgetItem *iKey = new QTableWidgetItem(
+                    QString::number(slist->getCurrent()->key));
+        QTableWidgetItem *iLvl = new QTableWidgetItem(
+                    QString::number(slist->getCurrent()->level));
+        w->setItem(ins_row, 0,iKey);
+        w->setItem(ins_row++, 1,iLvl);
+        slist->goNext();
+    }
+
+    qw->show();
+    qw->move(2, 250);
+
+    QWidget r;
+    QTableWidget t;
 }
