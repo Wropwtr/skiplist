@@ -6,7 +6,9 @@ class SkipTable: public SkipList<TData>{
 protected:
     Node<TData> *iterator;
 public:
-    SkipTable(int maxlevel, float p) : SkipList<TData>(maxlevel, p) {}
+    virtual void insert(int key, TData *&data) {SkipList<TData>::insert(key,data); reset(); }
+    virtual void remove(int key) {SkipList<TData>::remove(key); reset();}
+    SkipTable(int maxlevel, float p) : SkipList<TData>(maxlevel, p) {iterator = 0;}
 	int getPosition(int key);
     Node<TData>* getCurrent() { return iterator; }
     void goNext(){ if(iterator) iterator = iterator->forward->at(0); }

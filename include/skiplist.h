@@ -23,8 +23,8 @@ public:
 
 	int randomLevel();
     Node<TData>* find(int key);
-    void insert(int key, TData *&data);
-	void remove(int key);
+    virtual void insert(int key, TData *&data);
+    virtual void remove(int key);
 
 	void show();
 	void showLevels();
