@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "../../include/skiplist.h"
+#include "../../include/skiptable.h"
 #include <QMessageBox>
 #include <string.h>
 #include <fstream>
@@ -10,7 +10,7 @@
 
 using namespace std;
 
-SkipList<string> *slist;
+SkipTable<string> *stable;
 int RowCount = 0;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -22,26 +22,26 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setColumnWidth(0, 110);  
     ui->tableWidget->setEditTriggers(QTableWidget::NoEditTriggers);
     ui->tableWidget->horizontalHeader()->setStretchLastSection(1);
-    slist = new SkipList<string>(ui->sbLvl->value(),ui->sbProb->value());
+    stable = new SkipTable<string>(ui->sbLvl->value(),ui->sbProb->value());
 }
 
 MainWindow::~MainWindow()
 {
-    if (!slist)
-        delete slist;
+    if (!stable)
+        delete stable;
     delete ui;
 }
 
 void MainWindow::on_sbLvl_editingFinished()
 {
     ui->btnClear->click();
-    slist = new SkipList<string>(ui->sbLvl->value(),ui->sbProb->value());
+    stable = new SkipTable<string>(ui->sbLvl->value(),ui->sbProb->value());
 }
 
 void MainWindow::on_sbProb_editingFinished()
 {
     ui->btnClear->click();
-    slist = new SkipList<string>(ui->sbLvl->value(),ui->sbProb->value());
+    stable = new SkipTable<string>(ui->sbLvl->value(),ui->sbProb->value());
 }
 
 void MainWindow::on_btnAdd_clicked()
@@ -56,9 +56,9 @@ void MainWindow::on_btnAdd_clicked()
         return;
     }
     string *new_data = new string(Qdata.toStdString());
-    if (slist->find(new_key) == 0){
-        slist->insert(new_key,new_data);
-        int position = slist->getPosition(new_key);
+    if (stable->find(new_key) == 0){
+        stable->insert(new_key,new_data);
+        int position = stable->getPosition(new_key);
         if( position >= 0){
             QTableWidgetItem *iKey = new QTableWidgetItem(Qkey);
             QTableWidgetItem *iData = new QTableWidgetItem(Qdata);
@@ -83,7 +83,6 @@ void MainWindow::on_btnLoad_clicked()
     int ret = msgBox.exec();
     if (ret == QMessageBox::Cancel)
         return;
-
     QString filename = QFileDialog::getOpenFileName(
                 this,
                 tr("Open file"),
@@ -101,27 +100,28 @@ void MainWindow::on_btnLoad_clicked()
     while (fin >> key){
         getline(fin, data);
         pdata = new string(data);
-        slist->insert(key,pdata);
+        stable->insert(key,pdata);
     }
     fin.close();
-    slist->reset();
-    ui->tableWidget->setRowCount(slist->getSize());
+    stable->reset();
+    ui->tableWidget->setRowCount(stable->getSize());
     int ins_row = 0;
-    while(slist->getCurrent() != 0){
+    while(stable->getCurrent() != 0){
         QTableWidgetItem *iKey = new QTableWidgetItem(
-                    QString::number(slist->getCurrent()->key));
+                    QString::number(stable->getCurrent()->key));
         QTableWidgetItem *iData = new QTableWidgetItem(
-                    QString::fromStdString(*(slist->getCurrent()->data)));
+                    QString::fromStdString(*(stable->getCurrent()->data)));
         ui->tableWidget->setItem(ins_row, 0,iKey);
         ui->tableWidget->setItem(ins_row++, 1,iData);
-        slist->goNext();
+        stable->goNext();
     }
 }
 
 void MainWindow::on_btnClear_clicked()
 {
-    if(!slist)
-        delete slist;
+    if(!stable)
+        delete stable;
+    stable = new SkipTable<string>(ui->sbLvl->value(),ui->sbProb->value());
     ui->tableWidget->clear();
     ui->tableWidget->setRowCount(0);
     ui->edtAddData->setText("");
@@ -132,7 +132,7 @@ void MainWindow::on_btnClear_clicked()
 
 void MainWindow::on_btnSave_clicked()
 {
-    if(slist->isEmpty()){
+    if(stable->isEmpty()){
         QMessageBox::warning(this,"Error","No iformation to save.");
         return;
     }
@@ -146,11 +146,11 @@ void MainWindow::on_btnSave_clicked()
         QMessageBox::warning(this,"Error","Can not create file with this name.");
         return;
     }
-    slist->reset();
-    while(slist->getCurrent() != 0){
-        fout << slist->getCurrent()->key << " ";
-        fout << *(slist->getCurrent()->data) << "\n";
-        slist->goNext();
+    stable->reset();
+    while(stable->getCurrent() != 0){
+        fout << stable->getCurrent()->key << " ";
+        fout << *(stable->getCurrent()->data) << "\n";
+        stable->goNext();
     }
     fout.close();
     QMessageBox::information(this,"Success","Information was successfully saved.");
@@ -169,7 +169,7 @@ void MainWindow::on_btnFind_clicked()
 
     QTime myTimer;
     myTimer.start();
-    int position = slist->getPosition(key);
+    int position = stable->getPosition(key);
     if (position == -1){
         QMessageBox::warning(this,"Failed","Element with this key is not in table.");
         return;
@@ -182,22 +182,22 @@ void MainWindow::on_btnFind_clicked()
 
 void MainWindow::on_sbLvl_valueChanged(int arg1)
 {
-    if(!slist){
+    if(!stable){
         QMessageBox::warning(this,"Error","You should clear table before change.");
         return;
     }
     ui->btnClear->click();
-    slist = new SkipList<string>(arg1,ui->sbProb->value());
+    stable = new SkipTable<string>(arg1,ui->sbProb->value());
 }
 
 void MainWindow::on_sbProb_valueChanged(double arg1)
 {
-    if(!slist){
+    if(!stable){
         QMessageBox::warning(this,"Error","You should clear table before change.");
         return;
     }
     ui->btnClear->click();
-    slist = new SkipList<string>(ui->sbLvl->value(),arg1);
+    stable = new SkipTable<string>(ui->sbLvl->value(),arg1);
 }
 
 void MainWindow::on_btnDelete_clicked()
@@ -210,12 +210,12 @@ void MainWindow::on_btnDelete_clicked()
         QMessageBox::warning(this,"Error","Can not translate key to int.");
         return;
     }
-    int position = slist->getPosition(key);
+    int position = stable->getPosition(key);
     if (position == -1){
         QMessageBox::warning(this,"Error","Element with this key is not in table.");
         return;
     }
-    slist->remove(key);
+    stable->remove(key);
     ui->tableWidget->removeRow(position);
     QMessageBox::information(this,"Success","Element with this key successfully removed.");
 
@@ -223,12 +223,12 @@ void MainWindow::on_btnDelete_clicked()
 
 void MainWindow::on_sbLvl_valueChanged(const QString &arg1)
 {
-    if(!slist){
+    if(!stable){
         QMessageBox::warning(this,"Error","You should clear table before change.");
         return;
     }
     ui->btnClear->click();
-    slist = new SkipList<string>(arg1.toInt(),ui->sbProb->value());
+    stable = new SkipTable<string>(arg1.toInt(),ui->sbProb->value());
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -244,17 +244,17 @@ void MainWindow::on_pushButton_clicked()
     w->setEditTriggers(QTableWidget::NoEditTriggers);
     w->horizontalHeader()->setStretchLastSection(1);
     w->setHorizontalHeaderLabels(QStringList() << "Key" << "Level");
-    w->setRowCount(slist->getSize());
+    w->setRowCount(stable->getSize());
     int ins_row = 0;
-    slist->reset();
-    while(slist->getCurrent() != 0){
+    stable->reset();
+    while(stable->getCurrent() != 0){
         QTableWidgetItem *iKey = new QTableWidgetItem(
-                    QString::number(slist->getCurrent()->key));
+                    QString::number(stable->getCurrent()->key));
         QTableWidgetItem *iLvl = new QTableWidgetItem(
-                    QString::number(slist->getCurrent()->level));
+                    QString::number(stable->getCurrent()->level));
         w->setItem(ins_row, 0,iKey);
         w->setItem(ins_row++, 1,iLvl);
-        slist->goNext();
+        stable->goNext();
     }
 
     qw->show();

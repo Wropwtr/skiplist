@@ -6,20 +6,16 @@
 
 using namespace std;
 
-#define NELEMS 1024
+//#define NELEMS 128
+#define NELEMS 1000
 
 int main(){
     List<int> *list = new List<int>();
-    SkipList<int> *slist = new SkipList<int>(10, 0.5f); // for 2^10 = NELEMS
+    //SkipList<int> *slist = new SkipList<int>(7, 0.5f); // for 2^10 = NELEMS
+    SkipList<int> *slist = new SkipList<int>(10, 0.5f);
     int *a = new int;
     *a = 2345;
-
     srand(time(NULL));
-
-    /*for (int i = 0; i < NELEMS; i++){
-        list->ins(i, a);
-        slist->insert(i, a);
-    }*/
 
     for (int i = 0; i < NELEMS; i++){
         int r = rand();
@@ -27,15 +23,11 @@ int main(){
         slist->insert(r, a);
     }
 
-    /*for (int i = NELEMS; i > 0; i--){
-            list->ins(i, a);
-            slist->insert(i, a);
-        }*/
-
     cout << "For " << NELEMS << " elements" << endl;
 
     volatile int key;
     for (int nmeasures = 1; nmeasures <= 5; nmeasures++){
+
         clock_t begin = clock();
         for (int i = 0; i < 10000; i++){
             key = ((int)rand() % NELEMS);

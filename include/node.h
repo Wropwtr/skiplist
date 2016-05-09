@@ -7,7 +7,7 @@ class Node{
 	//friend class SkipList<TData>;
 	//protected:
 public:
-	int key;
+    int key;
 	int level;
 	TData *data;
 	vector<Node<TData>*> *forward;

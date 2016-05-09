@@ -12,12 +12,11 @@ using namespace std;
 
 template <class TData>
 class SkipList{
-private:
+protected:
 	Node<TData> *header;
 	int MAXLEVEL;
 	float probability;
 	int size;
-    Node<TData> *iterator;
 public:
 	SkipList(int maxlevel, float p);
 	~SkipList();
@@ -30,14 +29,7 @@ public:
 	void show();
 	void showLevels();
 
-    int getPosition(int key);
-
-    Node<TData>* getCurrent() { return iterator; }
-    void goNext(){ if(iterator) iterator = iterator->forward->at(0); }
-    void reset(){ iterator = header; }
-    int getSize(){ return size; }
-
-	int isEmpty(){ return (size == 0 && header == 0); }
+    int isEmpty(){ return (size == 0 && header == 0); }
 };
 
 template <class TData>
@@ -48,7 +40,7 @@ SkipList<TData>::SkipList(int maxlevel, float p){
 
 	MAXLEVEL = maxlevel;
 	header = 0;
-	probability = (float)(p < 1.0 && p > 0.0) ? p : 0.5;
+    probability = (float)(p <= 1.0 && p >= 0.0) ? p : 0.5;
 	size = 0;
 }
 
@@ -86,25 +78,6 @@ Node<TData>* SkipList<TData>::find(int key){
 	x = x->forward->at(0);
     if (x != 0 && x->key == key) return x;
 	return 0;
-}
-
-template <class TData>
-int SkipList<TData>::getPosition(int key){
-    if (size == 0)
-        return -1;
-    if(header->key == key)
-        return 0;
-    reset();
-    int position = 0;
-    while(getCurrent() != 0){
-        if(iterator->key == key)
-            return position;
-        if(iterator->key > key)
-            return -1;
-        goNext();
-        position++;
-    }
-    return -1;
 }
 
 template <class TData>

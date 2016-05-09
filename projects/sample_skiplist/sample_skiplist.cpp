@@ -25,15 +25,12 @@ int main(){
     cout << "\n\nShow levels:\n";
     list->showLevels();
 
-    cout << "\n\nShow levels:\n";
-    list->showLevels();
-
     cout << "\n\nFind 2:\n";
     Node<char> *x = list->find(2);
     if (x == 0)
         cout << "Sorry, but x is not in list\n";
     else
-        cout << "key: " << x->key << "data: " << x->data << endl;
+        cout << "key: " << x->key << " data: " << x->data << endl;
 
 
     cout << "\n\nRemove 2 and show:\n";
