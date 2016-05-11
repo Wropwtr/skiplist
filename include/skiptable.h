@@ -2,25 +2,29 @@
 #include "skiplist.h"
 
 template <class TData>
-class SkipTable: public SkipList<TData>{
+class SkipTable{
 protected:
     Node<TData> *iterator;
+    SkipList<TData> *slist;
 public:
-    virtual void insert(int key, TData *&data) {SkipList<TData>::insert(key,data); reset(); }
-    virtual void remove(int key) {SkipList<TData>::remove(key); reset();}
-    SkipTable(int maxlevel, float p) : SkipList<TData>(maxlevel, p) {iterator = 0;}
+    void insert(int key, TData *&data) {slist->insert(key,data); reset(); }
+    void remove(int key) {slist->remove(key); reset();}
+    Node<TData>* find(int key){ return slist->find(key); }
+    SkipTable(int maxlevel, float p){slist = new SkipList<TData>(maxlevel, p); iterator = 0;}
+    ~SkipTable(){ delete slist; if(!iterator) delete iterator; }
 	int getPosition(int key);
-    Node<TData>* getCurrent() { return iterator; }
+    Node<TData>* getCurrent(){ return iterator; }
     void goNext(){ if(iterator) iterator = iterator->forward->at(0); }
-    void reset(){ iterator = SkipList<TData>::header; }
-    int getSize(){ return (SkipList<TData>::size); }
+    void reset(){ iterator = slist->header; }
+    int getSize(){ return slist->size; }
+    int isEmpty(){ return slist->isEmpty(); }
 };
 
 template <class TData>
 int SkipTable<TData>::getPosition(int key){
-    if (SkipList<TData>::size == 0)
+    if (slist->size == 0)
         return -1;
-    if((SkipList<TData>::header)->key == key)
+    if((slist->header)->key == key)
         return 0;
     reset();
     int position = 0;

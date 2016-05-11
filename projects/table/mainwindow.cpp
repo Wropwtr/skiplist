@@ -259,7 +259,4 @@ void MainWindow::on_pushButton_clicked()
 
     qw->show();
     qw->move(2, 250);
-
-    QWidget r;
-    QTableWidget t;
 }

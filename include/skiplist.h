@@ -9,22 +9,21 @@
 using namespace std;
 
 //recommended number of elements ~(1 / PROBABILITY) ^ MAX_LEVEL = 128
-
 template <class TData>
 class SkipList{
-protected:
+public:
 	Node<TData> *header;
 	int MAXLEVEL;
 	float probability;
 	int size;
-public:
+
 	SkipList(int maxlevel, float p);
 	~SkipList();
 
 	int randomLevel();
     Node<TData>* find(int key);
-    virtual void insert(int key, TData *&data);
-    virtual void remove(int key);
+    void insert(int key, TData *&data);
+    void remove(int key);
 
 	void show();
 	void showLevels();
