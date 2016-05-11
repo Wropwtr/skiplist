@@ -40,9 +40,9 @@ int main(){
         double elapsed_secs_slist = double(end - begin)/10000/CLOCKS_PER_SEC;
         cout << "For " << NELEMS << " elements" << endl;
         cout << "list search time:     ";
-        printf("%0.8lf\n",elapsed_secs_list);
+        printf("%0.7lf\n",elapsed_secs_list);
         cout << "skiplist search time: ";
-        printf("%0.8lf\n",elapsed_secs_slist);
+        printf("%0.7lf\n",elapsed_secs_slist);
 
         delete list;
         delete slist;
